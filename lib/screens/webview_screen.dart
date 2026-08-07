@@ -182,7 +182,6 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                     supportZoom: true,
                     builtInZoomControls: false,
                     displayZoomControls: false,
-                    cacheMode: DroidDataCacheMode.LOAD_DEFAULT,
                   ),
                   pullToRefreshController: _pullToRefreshController,
                   onWebViewCreated: (controller) {
