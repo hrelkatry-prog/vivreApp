@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../constants/app_constants.dart';
 import '../services/location_service.dart';
 import 'gps_gate_screen.dart';
@@ -191,13 +190,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
               const Spacer(flex: 2),
 
-              // Loading Spinner
-              const SpinKitThreeBounce(
-                color: AppConstants.accentCyan,
-                size: 24.0,
+              // Beautiful native circular loading indicator
+              const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppConstants.accentCyan),
+                ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Text(
                 'جاري التحقق وتجهيز المسارات...',
                 style: TextStyle(
