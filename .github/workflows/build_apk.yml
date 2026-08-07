@@ -20,12 +20,13 @@ jobs:
       - name: 2. Set up Java JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: 3. Set up Flutter SDK
+      - name: 3. Set up Flutter SDK 3.24.3
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.3'
           channel: 'stable'
           cache: true
 
@@ -33,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: 5. Build Android Release APK
-        run: flutter build apk --release --no-tree-shake-icons --verbose
+        run: flutter build apk --release
 
       - name: 6. Upload APK as Downloadable Artifact
         uses: actions/upload-artifact@v4
