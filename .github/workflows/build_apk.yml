@@ -1,0 +1,58 @@
+name: Build Vivre Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # يتيح لك بناء التطبيق بضغطة زر واحدة من واجهة جيت هب أونلاين
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Generate Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 3. Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 4. Install Dependencies
+        run: flutter pub get
+
+      - name: 5. Build Android Release APK
+        run: flutter build apk --release
+
+      - name: 6. Upload APK as Downloadable Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vivre-App-Release-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: 7. Publish GitHub Release with Direct APK Download
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+          name: Vivre Mobile App v1.0.${{ github.run_number }}
+          tag_name: v1.0.${{ github.run_number }}
+          body: |
+            ## 📱 تطبيق Vivre الميداني لتوزيع المياه
+            - تم البناء السحابي تلقائياً بنجاح عبر GitHub Actions.
+            - يمكنك تحميل ملف الـ APK المرفق وتثبيته مباشرة على هواتف الأندرويد.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
