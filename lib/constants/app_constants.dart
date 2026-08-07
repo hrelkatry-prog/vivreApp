@@ -19,6 +19,12 @@ class AppConstants {
   static const Color warningOrange = Color(0xFFF59E0B);
   static const Color dangerRed = Color(0xFFEF4444);
 
+  // Modern Text Colors
+  static const Color textSlate300 = Color(0xFFCBD5E1);
+  static const Color textSlate400 = Color(0xFF94A3B8);
+  static const Color textSlate500 = Color(0xFF64748B);
+  static const Color textSlate600 = Color(0xFF475569);
+
   // User Agent
   static const String customUserAgent =
       'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 VivreApp/1.0';

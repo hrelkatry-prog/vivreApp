@@ -156,8 +156,8 @@ class _GpsGateScreenState extends State<GpsGateScreen> with WidgetsBindingObserv
                         ? 'تطبيق Vivre يتطلب تشغيل خدمة تحديد الموقع (GPS) لتوجيه مسارات شاحنات التوزيع ومتابعة حركة المبيعات وتوثيق زيارات العملاء بدقة.'
                         : 'يرجى منح تطبيق Vivre إذن الوصول إلى موقع الجهاز لمتابعة العمل وتوثيق فواتير التوزيع.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.slate.shade400,
+                    style: const TextStyle(
+                      color: AppConstants.textSlate400,
                       fontSize: 14,
                       height: 1.6,
                     ),
@@ -241,19 +241,19 @@ class _GpsGateScreenState extends State<GpsGateScreen> with WidgetsBindingObserv
                   const Spacer(),
 
                   // Bottom App Badge
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.water_drop_rounded,
                         color: AppConstants.accentCyan,
                         size: 16,
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Text(
                         'Vivre Water Distribution ERP',
                         style: TextStyle(
-                          color: Colors.slate.shade600,
+                          color: AppConstants.textSlate600,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),

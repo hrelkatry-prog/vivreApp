@@ -176,10 +176,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'نظام إدارة وتعبئة وتوزيع المياه الذكي',
                       style: TextStyle(
-                        color: Colors.slate.shade400,
+                        color: AppConstants.textSlate400,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -201,10 +201,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
 
               const SizedBox(height: 16),
-              Text(
+              const Text(
                 'جاري التحقق وتجهيز المسارات...',
                 style: TextStyle(
-                  color: Colors.slate.shade500,
+                  color: AppConstants.textSlate500,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),

@@ -125,14 +125,14 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                 ),
               ],
             ),
-            content: Text(
+            content: const Text(
               'هل أنت متأكد من رغبتك في إغلاق تطبيق Vivre؟',
-              style: TextStyle(color: Colors.slate.shade300, fontSize: 14),
+              style: TextStyle(color: AppConstants.textSlate300, fontSize: 14),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: Text('إلغاء', style: TextStyle(color: Colors.slate.shade400)),
+                child: const Text('إلغاء', style: TextStyle(color: AppConstants.textSlate400)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(true),
@@ -301,16 +301,16 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text(
+                        const Text(
                           'يرجى التأكد من اتصال الهاتف بالإنترنت والمحاولة مجدداً.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.slate.shade400, fontSize: 13, height: 1.5),
+                          style: TextStyle(color: AppConstants.textSlate400, fontSize: 13, height: 1.5),
                         ),
                         if (_errorMessage.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Text(
                             _errorMessage,
-                            style: TextStyle(color: Colors.slate.shade600, fontSize: 11),
+                            style: const TextStyle(color: AppConstants.textSlate600, fontSize: 11),
                           ),
                         ],
                         const SizedBox(height: 28),
