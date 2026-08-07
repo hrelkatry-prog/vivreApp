@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.vivre.water_distribution"
-    compileSdk 34
+    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -38,8 +38,8 @@ android {
 
     defaultConfig {
         applicationId "com.vivre.water_distribution"
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
