@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_constants.dart';
 import '../services/location_service.dart';
@@ -20,7 +19,7 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
   InAppWebViewController? _webViewController;
   PullToRefreshController? _pullToRefreshController;
   final LocationService _locationService = LocationService();
-  StreamSubscription<ServiceStatus>? _gpsStatusSubscription;
+  Timer? _gpsMonitorTimer;
 
   double _progress = 0;
   bool _isLoading = true;
@@ -35,13 +34,13 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
     _currentUrl = widget.url;
 
     _initPullToRefresh();
-    _listenToGpsStatus();
+    _startGpsMonitoring();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _gpsStatusSubscription?.cancel();
+    _gpsMonitorTimer?.cancel();
     _pullToRefreshController?.dispose();
     super.dispose();
   }
@@ -73,9 +72,11 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
           );
   }
 
-  void _listenToGpsStatus() {
-    _gpsStatusSubscription = _locationService.serviceStatusStream.listen((status) {
-      if (status == ServiceStatus.disabled) {
+  void _startGpsMonitoring() {
+    // Periodically verify GPS status every 5 seconds
+    _gpsMonitorTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      final isEnabled = await _locationService.isGpsEnabled();
+      if (!isEnabled && mounted) {
         _enforceGpsGate();
       }
     });
@@ -90,6 +91,7 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
 
   void _enforceGpsGate() {
     if (!mounted) return;
+    _gpsMonitorTimer?.cancel();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => GpsGateScreen(

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../constants/app_constants.dart';
 import '../services/location_service.dart';
 import 'webview_screen.dart';
@@ -15,7 +14,7 @@ class GpsGateScreen extends StatefulWidget {
 
 class _GpsGateScreenState extends State<GpsGateScreen> with WidgetsBindingObserver {
   final LocationService _locationService = LocationService();
-  StreamSubscription<ServiceStatus>? _statusSubscription;
+  Timer? _periodicCheckTimer;
   bool _isChecking = false;
   GpsCheckResult _currentStatus = GpsCheckResult.gpsDisabled;
 
@@ -24,13 +23,13 @@ class _GpsGateScreenState extends State<GpsGateScreen> with WidgetsBindingObserv
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _checkGpsStatus();
-    _listenToGpsStatusChanges();
+    _startPeriodicCheck();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _statusSubscription?.cancel();
+    _periodicCheckTimer?.cancel();
     super.dispose();
   }
 
@@ -42,9 +41,9 @@ class _GpsGateScreenState extends State<GpsGateScreen> with WidgetsBindingObserv
     }
   }
 
-  void _listenToGpsStatusChanges() {
-    _statusSubscription = _locationService.serviceStatusStream.listen((status) {
-      if (status == ServiceStatus.enabled) {
+  void _startPeriodicCheck() {
+    _periodicCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (mounted) {
         _checkGpsStatus();
       }
     });
@@ -63,6 +62,7 @@ class _GpsGateScreenState extends State<GpsGateScreen> with WidgetsBindingObserv
     });
 
     if (result == GpsCheckResult.ready) {
+      _periodicCheckTimer?.cancel();
       // GPS is Active and Permission granted! Proceed to Web App
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
