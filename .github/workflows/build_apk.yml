@@ -33,7 +33,7 @@ jobs:
         run: flutter pub get
 
       - name: 5. Build Android Release APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release --no-tree-shake-icons --verbose
 
       - name: 6. Upload APK as Downloadable Artifact
         uses: actions/upload-artifact@v4
