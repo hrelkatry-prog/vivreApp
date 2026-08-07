@@ -3,6 +3,12 @@ allprojects {
         google()
         mavenCentral()
     }
+    ext {
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        minSdkVersion = 21
+        buildToolsVersion = "34.0.0"
+    }
 }
 
 rootProject.buildDir = "../build"
@@ -11,17 +17,6 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
-}
-
-subprojects {
-    project.plugins.whenPluginAdded { plugin ->
-        if (plugin.class.name.startsWith("com.android.build.gradle")) {
-            project.android {
-                compileSdkVersion 34
-                buildToolsVersion "34.0.0"
-            }
-        }
-    }
 }
 
 tasks.register("clean", Delete) {
