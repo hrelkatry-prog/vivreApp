@@ -23,10 +23,9 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: 3. Set up Flutter SDK (Stable 3.22.2)
+      - name: 3. Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2'
           channel: 'stable'
           cache: true
 
