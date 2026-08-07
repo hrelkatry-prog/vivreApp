@@ -3,7 +3,7 @@ name: Build Vivre Android APK
 on:
   push:
     branches: [ "main", "master" ]
-  workflow_dispatch: # يتيح لك بناء التطبيق بضغطة زر واحدة من واجهة جيت هب أونلاين
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -23,9 +23,10 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: 3. Set up Flutter SDK
+      - name: 3. Set up Flutter SDK (Stable 3.22.2)
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.22.2'
           channel: 'stable'
           cache: true
 
@@ -33,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: 5. Build Android Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: 6. Upload APK as Downloadable Artifact
         uses: actions/upload-artifact@v4
