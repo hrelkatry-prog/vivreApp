@@ -35,14 +35,7 @@ jobs:
         run: flutter pub get
 
       - name: 5. Build Android Release APK
-        run: |
-          set +e
-          flutter build apk --release --android-skip-build-dependency-validation --verbose > build.log 2>&1
-          STATUS=$?
-          if [ $STATUS -ne 0 ]; then
-            echo "Build failed with code $STATUS"
-            exit $STATUS
-          fi
+        run: flutter build apk --release --android-skip-build-dependency-validation
 
       - name: 6. Upload APK as Downloadable Artifact
         uses: actions/upload-artifact@v4
@@ -65,15 +58,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Diagnostic - Commit Log on Failure
-        if: failure()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B build-diagnostics
-          echo "=== BUILD LOG DIAGNOSTICS ===" > BUILD_DIAGNOSTICS.txt
-          tail -n 350 build.log >> BUILD_DIAGNOSTICS.txt || true
-          git add BUILD_DIAGNOSTICS.txt
-          git commit -m "Auto diagnostics for run ${{ github.run_number }}" || true
-          git push -f origin build-diagnostics || true

@@ -291,10 +291,10 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                     final desc = error.description.toLowerCase();
                     if (desc.contains('err_unknown_url_scheme') ||
                         desc.contains('unknown_url_scheme') ||
-                        error.type == WebResourceErrorType.UNKNOWN_URL_SCHEME) {
-                      final uri = request.url;
-                      if (uri != null) {
-                        _handleExternalUrl(uri);
+                        desc.contains('scheme')) {
+                      final url = request.url;
+                      if (url != null) {
+                        _handleExternalUrl(Uri.parse(url.toString()));
                       }
                       return;
                     }
@@ -315,10 +315,10 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                     );
                   },
                   shouldOverrideUrlLoading: (controller, navigationAction) async {
-                    final uri = navigationAction.request.url;
-                    if (uri == null) return NavigationActionPolicy.ALLOW;
+                    final url = navigationAction.request.url;
+                    if (url == null) return NavigationActionPolicy.ALLOW;
 
-                    final handled = await _handleExternalUrl(uri);
+                    final handled = await _handleExternalUrl(Uri.parse(url.toString()));
                     if (handled) {
                       return NavigationActionPolicy.CANCEL;
                     }
@@ -326,9 +326,9 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                     return NavigationActionPolicy.ALLOW;
                   },
                   onCreateWindow: (controller, createWindowAction) async {
-                    final uri = createWindowAction.request.url;
-                    if (uri != null) {
-                      await _handleExternalUrl(uri);
+                    final url = createWindowAction.request.url;
+                    if (url != null) {
+                      await _handleExternalUrl(Uri.parse(url.toString()));
                     }
                     return false; // Handled externally, don't create child webview
                   },
