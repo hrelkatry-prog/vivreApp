@@ -148,6 +148,78 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
         false;
   }
 
+  /// Bulletproof handler for external navigation intents, Google Maps, Navigation, Calls & WhatsApp
+  Future<bool> _handleExternalUrl(Uri uri) async {
+    final urlString = uri.toString();
+    final scheme = uri.scheme.toLowerCase();
+
+    // 1. Android Intent Protocol (intent://...)
+    if (scheme == 'intent') {
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return true;
+        }
+
+        // Try extracting fallback HTTP/HTTPS URL from intent
+        final match = RegExp(r'(?:browser_fallback_url|link)=([^;]+)').firstMatch(urlString);
+        if (match != null) {
+          final fallbackUrl = Uri.parse(Uri.decodeComponent(match.group(1)!));
+          await launchUrl(fallbackUrl, mode: LaunchMode.externalApplication);
+          return true;
+        }
+      } catch (e) {
+        debugPrint('Error handling intent URL: $e');
+      }
+      return true; // Cancel webview load regardless so it doesn't throw ERR_UNKNOWN_URL_SCHEME
+    }
+
+    // 2. Identify Maps, Routes, GPS Navigation, Waze
+    final isMaps = scheme == 'geo' ||
+        scheme == 'google.navigation' ||
+        scheme == 'waze' ||
+        scheme == 'maps' ||
+        uri.host.contains('maps.google.') ||
+        (uri.host.contains('google.com') && uri.path.contains('maps')) ||
+        uri.host.contains('maps.app.goo.gl') ||
+        uri.host.contains('goo.gl') ||
+        uri.host.contains('waze.com') ||
+        uri.host.contains('maps.apple.com');
+
+    // 3. Identify Phone calls, WhatsApp, Email, SMS
+    final isCommunication = scheme == 'tel' ||
+        scheme == 'mailto' ||
+        scheme == 'sms' ||
+        scheme == 'whatsapp' ||
+        uri.host.contains('whatsapp.com') ||
+        uri.host.contains('wa.me');
+
+    // 4. Any Non-HTTP scheme (deep links, external apps)
+    final isNonHttpScheme = scheme.isNotEmpty &&
+        scheme != 'http' &&
+        scheme != 'https' &&
+        scheme != 'about' &&
+        scheme != 'data' &&
+        scheme != 'javascript';
+
+    if (isMaps || isCommunication || isNonHttpScheme) {
+      try {
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!launched) {
+          await launchUrl(uri, mode: LaunchMode.platformDefault);
+        }
+      } catch (e) {
+        debugPrint('Error launching external URL: $e');
+        try {
+          await launchUrl(uri, mode: LaunchMode.platformDefault);
+        } catch (_) {}
+      }
+      return true; // Intercepted and handled
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -173,6 +245,8 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                     mediaPlaybackRequiresUserGesture: false,
                     allowsInlineMediaPlayback: true,
                     javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true,
+                    supportMultipleWindows: true,
                     domStorageEnabled: true,
                     databaseEnabled: true,
                     geolocationEnabled: true, // Enable HTML5 Geolocation API
@@ -212,6 +286,19 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                   },
                   onReceivedError: (controller, request, error) {
                     _pullToRefreshController?.endRefreshing();
+                    
+                    // Ignore ERR_UNKNOWN_URL_SCHEME because external intents/maps are handled via url_launcher
+                    final desc = error.description.toLowerCase();
+                    if (desc.contains('err_unknown_url_scheme') ||
+                        desc.contains('unknown_url_scheme') ||
+                        error.type == WebResourceErrorType.UNKNOWN_URL_SCHEME) {
+                      final uri = request.url;
+                      if (uri != null) {
+                        _handleExternalUrl(uri);
+                      }
+                      return;
+                    }
+
                     if (request.isForMainFrame ?? true) {
                       setState(() {
                         _hasError = true;
@@ -231,21 +318,19 @@ class _WebViewScreenState extends State<WebViewScreen> with WidgetsBindingObserv
                     final uri = navigationAction.request.url;
                     if (uri == null) return NavigationActionPolicy.ALLOW;
 
-                    final scheme = uri.scheme.toLowerCase();
-                    // Handle external intents (tel:, mailto:, whatsapp:, geo:, maps:)
-                    if (scheme == 'tel' ||
-                        scheme == 'mailto' ||
-                        scheme == 'whatsapp' ||
-                        scheme == 'geo' ||
-                        uri.host.contains('maps.google.com') ||
-                        uri.host.contains('maps.apple.com')) {
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                        return NavigationActionPolicy.CANCEL;
-                      }
+                    final handled = await _handleExternalUrl(uri);
+                    if (handled) {
+                      return NavigationActionPolicy.CANCEL;
                     }
 
                     return NavigationActionPolicy.ALLOW;
+                  },
+                  onCreateWindow: (controller, createWindowAction) async {
+                    final uri = createWindowAction.request.url;
+                    if (uri != null) {
+                      await _handleExternalUrl(uri);
+                    }
+                    return false; // Handled externally, don't create child webview
                   },
                 ),
 

@@ -44,11 +44,15 @@
             android:value="2" />
     </application>
     
-    <!-- Queries for external intents (WhatsApp, Phone call, Google Maps) -->
+    <!-- Queries for external intents (WhatsApp, Phone call, Google Maps, Navigation, Geo, Waze) -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
         </intent>
         <intent>
             <action android:name="android.intent.action.DIAL" />
@@ -58,7 +62,17 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="geo" />
         </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="google.navigation" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="waze" />
+        </intent>
         <package android:name="com.google.android.apps.maps" />
+        <package android:name="com.waze" />
         <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
     </queries>
 </manifest>
