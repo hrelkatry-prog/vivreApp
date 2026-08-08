@@ -50,7 +50,6 @@ class VivreApp extends StatelessWidget {
           primary: AppConstants.primaryBlue,
           secondary: AppConstants.accentCyan,
           surface: AppConstants.cardBg,
-          background: AppConstants.bgDark,
           error: AppConstants.dangerRed,
         ),
         textTheme: GoogleFonts.cairoTextTheme(

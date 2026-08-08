@@ -33,7 +33,17 @@ jobs:
         run: flutter pub get
 
       - name: 5. Build Android Release APK
-        run: flutter build apk --release
+        run: |
+          set +e
+          flutter build apk --release --verbose > build.log 2>&1
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "========== BUILD FAILED - CRITICAL ERROR LOGS =========="
+            grep -E "FAILURE|Error|Exception|compileFlutterBuildRelease|FAILED" -C 3 build.log | tail -n 80 || true
+            echo "========== LAST 120 LINES OF LOG =========="
+            tail -n 120 build.log
+            exit $STATUS
+          fi
 
       - name: 6. Upload APK as Downloadable Artifact
         uses: actions/upload-artifact@v4
