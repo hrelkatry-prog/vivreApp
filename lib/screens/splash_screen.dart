@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
 import '../services/location_service.dart';
+import '../services/update_service.dart';
 import 'gps_gate_screen.dart';
+import 'update_gate_screen.dart';
 import 'webview_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,6 +18,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   final LocationService _locationService = LocationService();
+  final UpdateService _updateService = UpdateService();
+
+  String _loadingMessage = 'جاري التحقق من التحديثات...';
 
   @override
   void initState() {
@@ -47,12 +52,44 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _initializeApp() async {
-    // Show splash for at least 1.8 seconds for smooth branding experience
-    await Future.delayed(const Duration(milliseconds: 1800));
+    // Show splash for smooth branding
+    await Future.delayed(const Duration(milliseconds: 1200));
 
     if (!mounted) return;
 
-    // Check GPS & Permissions
+    // 1. Check for In-App Updates
+    setState(() {
+      _loadingMessage = 'جاري فحص إصدار النظام...';
+    });
+
+    final updateInfo = await _updateService.checkForUpdate();
+
+    if (!mounted) return;
+
+    if (updateInfo.hasUpdate) {
+      // Show update gate screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => UpdateGateScreen(
+            updateInfo: updateInfo,
+            onDismiss: () => _proceedToGpsCheck(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // 2. Proceed to GPS & Permissions verification
+    await _proceedToGpsCheck();
+  }
+
+  Future<void> _proceedToGpsCheck() async {
+    if (!mounted) return;
+
+    setState(() {
+      _loadingMessage = 'جاري التحقق من الـ GPS والموقع...';
+    });
+
     final result = await _locationService.checkGpsAndPermission();
 
     if (!mounted) return;
@@ -201,9 +238,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
 
               const SizedBox(height: 16),
-              const Text(
-                'جاري التحقق وتجهيز المسارات...',
-                style: TextStyle(
+              Text(
+                _loadingMessage,
+                style: const TextStyle(
                   color: AppConstants.textSlate500,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,

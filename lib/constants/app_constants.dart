@@ -4,10 +4,14 @@ class AppConstants {
   // App Identity
   static const String appName = 'Vivre';
   static const String appFullName = 'Vivre | نظام إدارة وتوزيع المياه';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.0.32';
+  static const int appBuildNumber = 32;
 
-  // Hardcoded fixed system URL (No manual settings screen)
+  // System Base URLs & Endpoints
   static const String systemBaseUrl = 'https://w.rseha.com/';
+  static const String versionCheckUrl = 'https://w.rseha.com/api/app/version';
+  static const String githubLatestReleaseApi = 'https://api.github.com/repos/hrelkatry-prog/vivreApp/releases/latest';
+  static const String fallbackApkDownloadUrl = 'https://github.com/hrelkatry-prog/vivreApp/releases/latest';
 
   // Brand Colors
   static const Color primaryBlue = Color(0xFF0284C7); // Sky 600
@@ -27,5 +31,5 @@ class AppConstants {
 
   // User Agent
   static const String customUserAgent =
-      'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 VivreApp/1.0';
+      'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 VivreApp/1.0.32';
 }
