@@ -37,7 +37,7 @@ jobs:
       - name: 5. Build Android Release APK
         run: |
           set +e
-          flutter build apk --release --verbose > build.log 2>&1
+          flutter build apk --release --android-skip-build-dependency-validation --verbose > build.log 2>&1
           STATUS=$?
           if [ $STATUS -ne 0 ]; then
             echo "Build failed with code $STATUS"
